@@ -117,6 +117,16 @@ output{transform-origin:right center}
 .aviso.on{opacity:1;transform:none}
 .aviso b{font-size:22px;line-height:1}
 @media(max-width:720px){.aviso{top:62px}}
+.lime .k{color:var(--on1)}.lime .v{color:#0b0b0b}
+.fat{flex:1;padding-bottom:2px}
+.sw{position:relative;flex:none;display:block;width:92px;height:46px;padding:0;border-radius:999px;background:#0b0b0b;border:2px solid #0b0b0b;overflow:hidden}
+.sw .knob{position:absolute;top:3px;left:3px;width:36px;height:36px;border-radius:50%;background:var(--lime);box-shadow:0 2px 8px rgba(0,0,0,.5);transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+:root[data-tipo="exp"] .sw .knob{transform:translateX(46px)}
+.sw svg{display:block!important;position:absolute;top:10px;width:22px;height:22px;z-index:1;animation:none;transition:color .3s}
+.sw .i-plt{left:10px;color:#0b0b0b}
+.sw .i-nav{left:56px;color:#7d7d7d}
+:root[data-tipo="exp"] .sw .i-plt{color:#7d7d7d}
+:root[data-tipo="exp"] .sw .i-nav{color:#0b0b0b}
 .card[hidden]{display:none}
 </style>
 </head>
@@ -135,8 +145,8 @@ output{transform-origin:right center}
     <section class="card lime">
       
       <div class="row">
-        <button type="button" id="tg" class="tg" title="Trocar tipo de palete"><svg class="i-plt" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2" y="10" width="20" height="3" rx=".8" fill="currentColor"/><rect x="3" y="13" width="3.5" height="4" fill="currentColor"/><rect x="10.25" y="13" width="3.5" height="4" fill="currentColor"/><rect x="17.5" y="13" width="3.5" height="4" fill="currentColor"/><rect x="2" y="17" width="20" height="3" rx=".8" fill="currentColor"/></svg><svg class="i-nav" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10.5" width="4" height="4" fill="currentColor"/><rect x="7.5" y="10.5" width="4" height="4" fill="currentColor"/><rect x="12" y="10.5" width="4" height="4" fill="currentColor"/><rect x="5.2" y="6" width="4" height="4" fill="currentColor"/><rect x="9.7" y="6" width="4" height="4" fill="currentColor"/><rect x="17.5" y="8" width="3.5" height="6.5" fill="currentColor"/><path d="M2 15.5h20l-3 4.5H5z" fill="currentColor"/><path d="M2 22.5c1.8-1 3.2-1 5 0s3.2 1 5 0 3.2-1 5 0 3.2 1 5 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span id="tgn">PLT Viemar</span></button><label>Comprimento (cm)<input id="bc" inputmode="decimal"></label>
-        <label>Largura (cm)<input id="bl" inputmode="decimal"></label>
+        <button type="button" id="tg" class="sw" role="switch" aria-checked="false" title="Trocar tipo de palete"><span class="knob"></span><svg class="i-plt" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2" y="10" width="20" height="3" rx=".8" fill="currentColor"/><rect x="3" y="13" width="3.5" height="4" fill="currentColor"/><rect x="10.25" y="13" width="3.5" height="4" fill="currentColor"/><rect x="17.5" y="13" width="3.5" height="4" fill="currentColor"/><rect x="2" y="17" width="20" height="3" rx=".8" fill="currentColor"/></svg><svg class="i-nav" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="10.5" width="4" height="4" fill="currentColor"/><rect x="7.5" y="10.5" width="4" height="4" fill="currentColor"/><rect x="12" y="10.5" width="4" height="4" fill="currentColor"/><rect x="5.2" y="6" width="4" height="4" fill="currentColor"/><rect x="9.7" y="6" width="4" height="4" fill="currentColor"/><rect x="17.5" y="8" width="3.5" height="6.5" fill="currentColor"/><path d="M2 15.5h20l-3 4.5H5z" fill="currentColor"/><path d="M2 22.5c1.8-1 3.2-1 5 0s3.2 1 5 0 3.2-1 5 0 3.2 1 5 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><div class="fat"><div class="k"><b id="tgn">PLT Viemar</b> · cubagem por cm de altura</div><div class="v" id="fat">0,007 m³</div></div>
+        
       </div>
       
     </section>
@@ -189,12 +199,10 @@ output{transform-origin:right center}
 </div>
 
 </div>
-<div id="avCx" class="aviso" role="status"><b>⚠</b><span>Máximo de 19 caixas avulsas. Acima disso já pode ser um palete fechado.</span></div>
 <script>
 const $=s=>document.querySelector(s);
-let tipos={meio:{c:100,l:60},exp:{c:110,l:110}},tipo='meio',base;
-try{const s=JSON.parse(localStorage.getItem('cub_tipos'));if(s)for(const k in tipos)if(s[k]&&s[k].c>0&&s[k].l>0)tipos[k]=s[k];const t=localStorage.getItem('cub_tipo');if(t&&tipos[t])tipo=t}catch(e){}
-base=tipos[tipo];
+const fator={meio:0.007,exp:0.012};let tipo='meio';
+try{const t=localStorage.getItem('cub_tipo');if(t&&fator[t])tipo=t}catch(e){}
 const num=v=>{const n=parseFloat(String(v).replace(',','.'));return isFinite(n)&&n>0?n:0};
 const fmt=n=>n.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3});
 const int=n=>n.toLocaleString('pt-BR');
@@ -217,12 +225,12 @@ function addRow(type){
 function val(r,k){const e=r.querySelector(`[data-k="${k}"]`);return e?num(e.value):0}
 
 function calc(){
-  base=tipos[tipo]={c:num($('#bc').value)||base.c,l:num($('#bl').value)||base.l};
+  
   const hasP=[...document.querySelectorAll('#pl .row')].some(r=>val(r,'h')>0);
   $('#bx').closest('section').hidden=hasP;$('#br').closest('section').hidden=!hasP;
   let sp=0,np=0,cp=0,sb=0,nb=0,sr=0,nr=0;
   document.querySelectorAll('#pl .row').forEach((r,i)=>{r.querySelector('.n').textContent=i+1;
-    const q=val(r,'q'),v=base.c*base.l*val(r,'h')/1e6;
+    const q=val(r,'q'),v=fator[tipo]*val(r,'h');
     r.querySelector('output').textContent=fmt(v)+' m³';sp+=v;if(val(r,'h')>0)np+=1;cp+=q;
   });
   document.querySelectorAll('#bx .row').forEach(r=>{
@@ -234,18 +242,15 @@ function calc(){
   $('#tB').textContent=fmt(sb)+' m³';$('#nB').textContent=int(nb)+(nb===1?' caixa':' caixas');
   $('#tR').textContent=fmt(sr)+' m³';$('#nR').textContent=int(nr)+(nr===1?' barra':' barras');
   $('#tT').textContent=fmt(sp+sb+sr)+' m³';$('#tC').textContent=int(cp+nb+nr);
-  try{localStorage.setItem('cub_tipos',JSON.stringify(tipos));localStorage.setItem('cub_tipo',tipo)}catch(e){}
+  try{localStorage.setItem('cub_tipo',tipo)}catch(e){}
 }
 
-$('#bc').value=base.c;$('#bl').value=base.l;
-function setTipo(t){tipo=t;base=tipos[t];$('#bc').value=base.c;$('#bl').value=base.l;document.documentElement.dataset.tipo=t;$('#tgn').textContent=t==='exp'?'Exportação':'PLT Viemar';calc()}
+function setTipo(t){tipo=t;$('#fat').textContent=fator[t].toLocaleString('pt-BR',{minimumFractionDigits:3})+' m³';document.documentElement.dataset.tipo=t;$('#tg').setAttribute('aria-checked',t==='exp');$('#tgn').textContent=t==='exp'?'Exportação':'PLT Viemar';calc()}
 $('#tg').onclick=()=>setTipo(tipo==='meio'?'exp':'meio');
-$('#bc').oninput=$('#bl').oninput=calc;
+
 $('#addP').onclick=()=>addRow('p');
-function clampCx(){const i=$('#bx [data-k="q"]');if(num(i.value)>19){i.value=19;avisar()}}
-function avisar(){const a=$('#avCx');a.classList.add('on');clearTimeout(avisar.t);avisar.t=setTimeout(()=>a.classList.remove('on'),4500)}
-$('#bx').addEventListener('input',()=>{clampCx();calc()});$('#br').addEventListener('input',calc);
-document.querySelectorAll('#bx .step button,#br .step button').forEach(b=>b.onclick=()=>{const i=b.parentNode.querySelector('input');i.value=Math.max(0,Math.floor(num(i.value))+Number(b.dataset.d));if(b.closest('#bx'))clampCx();calc()});
+$('#bx').addEventListener('input',calc);$('#br').addEventListener('input',calc);
+document.querySelectorAll('#bx .step button,#br .step button').forEach(b=>b.onclick=()=>{const i=b.parentNode.querySelector('input');i.value=Math.max(0,Math.floor(num(i.value))+Number(b.dataset.d));calc()});
 $('#clear').onclick=()=>{$('#pl').innerHTML='';$('#bx [data-k="q"]').value=0;$('#bx [data-k="v"]').value='0,02';$('#br [data-k="q"]').value=0;$('#br [data-k="v"]').value='0,02';addRow('p')};
 $('#copy').onclick=async()=>{
   const nr=parseInt($('#nR').textContent)||0;const t=$('#tT').textContent+(nr?`\nOBS: ${$('#nR').textContent}`:'');
